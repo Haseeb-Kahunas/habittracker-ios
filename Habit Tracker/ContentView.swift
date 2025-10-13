@@ -19,7 +19,7 @@ struct ContentView: View {
             
             // Welcome Section
             VStack(spacing: 8) {
-                Text("Hi User!")
+                Text(timeBasedGreeting())
                     .font(.largeTitle)
                     .fontWeight(.bold)
                 
@@ -33,10 +33,26 @@ struct ContentView: View {
         }
     }
     
+    // Time-based greeting function
+    func timeBasedGreeting() -> String {
+        let hour = Calendar.current.component(.hour, from: Date())
+        
+        switch hour {
+        case 0..<12:
+            return "Good Morning, Haseeb!"
+        case 12..<17:
+            return "Good Afternoon, Haseeb!"
+        case 17..<22:
+            return "Good Evening, Haseeb!"
+        default:
+            return "Good Night, Haseeb!"
+        }
+    }
+    
     // Helper function to format today's date
     func todayDateString() -> String {
         let formatter = DateFormatter()
-        formatter.dateStyle = .long  // e.g., "October 9, 2025"
+        formatter.dateStyle = .long
         formatter.timeStyle = .none
         return formatter.string(from: Date())
     }
@@ -45,4 +61,3 @@ struct ContentView: View {
 #Preview {
     ContentView()
 }
-
