@@ -10,11 +10,12 @@ import SwiftUI
 struct ContentView: View {
     var body: some View {
         VStack(spacing: 20) {
-            // Company Logo at top center
-            Image("CompanyLogo")
+            // Company Logo at top center (using SF Symbol)
+            Image(systemName: "checkmark.circle.fill")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 120, height: 120)
+                .foregroundStyle(.green)
                 .padding(.top, 40)
             
             // Welcome Section with time-based greeting
