@@ -10,14 +10,15 @@ import SwiftUI
 struct ContentView: View {
     var body: some View {
         VStack(spacing: 20) {
-            // Company Logo at top center
-            Image("CompanyLogo")
+            // Company Logo at top center (using SF Symbol)
+            Image(systemName: "checkmark.circle.fill")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 120, height: 120)
+                .foregroundStyle(.green)
                 .padding(.top, 40)
             
-            // Welcome Section
+            // Welcome Section with time-based greeting
             VStack(spacing: 8) {
                 Text(timeBasedGreeting())
                     .font(.largeTitle)
@@ -29,7 +30,14 @@ struct ContentView: View {
             }
             .padding(.top, 20)
             
+            // Spacer pushes version to bottom
             Spacer()
+            
+            // Version label at bottom
+            Text(appVersion())
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .padding(.bottom, 20)
         }
     }
     
@@ -55,6 +63,12 @@ struct ContentView: View {
         formatter.dateStyle = .long
         formatter.timeStyle = .none
         return formatter.string(from: Date())
+    }
+    
+    // Auto-synced version number from Bundle
+    func appVersion() -> String {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
+        return "v\(version)"
     }
 }
 
