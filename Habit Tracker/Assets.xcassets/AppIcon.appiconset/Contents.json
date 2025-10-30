@@ -1,1 +1,14 @@
-{"images":[{"size":"60x60","expected-size":"180",...
+{
+  "images" : [
+    {
+      "filename" : "1024.png",
+      "idiom" : "universal",
+      "platform" : "ios",
+      "size" : "1024x1024"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
