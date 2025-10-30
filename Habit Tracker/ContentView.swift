@@ -44,10 +44,15 @@ struct ContentView: View {
                                 .foregroundColor(habits[index].isCompleted ? .gray : .primary)
                         }
                         .toggleStyle(CheckboxToggleStyle())
-                        .animation(.spring(response: 0.5, dampingFraction: 0.3), value: habits[index].isCompleted)
+                        .animation(.spring(response: 0.3, dampingFraction: 0.6), value: habits[index].isCompleted)
+                        .padding()                                    // ← ADD THIS
+                        .background(Color(.secondarySystemBackground))  // ← ADD THIS
+                        .cornerRadius(10)                             // ← ADD THIS
+                        .shadow(color: .gray.opacity(0.2), radius: 3, x: 0, y: 2)  // ← ADD THIS
                     }
                 }
                 .padding(.horizontal, 30)
+
                 
                 // Version at bottom
                 Text("Version \(appVersion())")
