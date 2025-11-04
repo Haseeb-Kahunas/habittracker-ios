@@ -10,6 +10,8 @@ import SwiftUI
 struct ContentView: View {
     // State: This tells SwiftUI to watch for changes and update the UI
     @State private var habits: [Habit] = []
+    @State private var currentStreak: Int = 0
+    @State private var lastCompletionDate: Date?
     
     var body: some View {
         ScrollView {
@@ -30,6 +32,16 @@ struct ContentView: View {
                     .font(.subheadline)
                     .foregroundColor(.gray)
                 
+                // NEW: Streak Display
+                HStack(spacing: 8) {
+                    Text("🔥")
+                        .font(.title2)
+                    Text("\(currentStreak) Day Streak")
+                        .font(.headline)
+                        .foregroundColor(currentStreak > 0 ? .orange : .gray)
+                }
+                .padding(.top, 10)
+
                 // Habits Section
                 VStack(alignment: .leading, spacing: 15) {
                     Text("Daily Habits:")
@@ -71,21 +83,83 @@ struct ContentView: View {
             saveHabits()
         }
     }
-    
+    // MARK: - Streak Logic
+
+    /// Check and update streak when app launches
+    func updateStreakOnLaunch() {
+        // Load saved streak data
+        currentStreak = UserDefaults.standard.integer(forKey: "currentStreak")
+        
+        if let savedDate = UserDefaults.standard.object(forKey: "lastCompletionDate") as? Date {
+            lastCompletionDate = savedDate
+            
+            let calendar = Calendar.current
+            
+            if calendar.isDateInYesterday(savedDate) {
+                print("✅ Streak maintained: \(currentStreak) days")
+            } else if calendar.isDateInToday(savedDate) {
+                print("✅ Already completed today: \(currentStreak) days")
+            } else {
+                currentStreak = 0
+                UserDefaults.standard.set(0, forKey: "currentStreak")
+                print("❌ Streak reset - missed a day")
+            }
+        } else {
+            currentStreak = 0
+            print("🆕 Starting new streak")
+        }
+    }
+    /// Check if all habits are completed
+    func allHabitsCompleted() -> Bool {
+        // If no habits, return false
+        guard !habits.isEmpty else { return false }
+        
+        // Check if every habit is completed
+        return habits.allSatisfy { $0.isCompleted }
+    }
+
+    /// Called when user completes all habits for the day
+    func checkAndUpdateStreak() {
+        // Only update if all habits are completed
+        guard allHabitsCompleted() else {
+            return
+        }
+        
+        let calendar = Calendar.current
+        let today = Date()
+        
+        // Check if we already counted today
+        if let lastDate = lastCompletionDate,
+           calendar.isDate(lastDate, inSameDayAs: today) {
+            // Already completed and counted today - don't increment again
+            print("⏭️ Already counted today's streak")
+            return
+        }
+        
+        // Increment streak!
+        currentStreak += 1
+        lastCompletionDate = today
+        
+        // Save to UserDefaults
+        UserDefaults.standard.set(currentStreak, forKey: "currentStreak")
+        UserDefaults.standard.set(lastCompletionDate, forKey: "lastCompletionDate")
+        
+        print("🔥 Streak increased to \(currentStreak) days!")
+    }
     // MARK: - Persistence Functions
     
     /// Load habits from UserDefaults, or create default habits if none exist
     func loadHabits() {
         if let data = UserDefaults.standard.data(forKey: "savedHabits"),
            let decoded = try? JSONDecoder().decode([Habit].self, from: data) {
-            // Found saved habits - load them!
             habits = decoded
             print("✅ Loaded \(decoded.count) habits from UserDefaults")
         } else {
-            // No saved habits - create default ones
             habits = createDefaultHabits()
             print("🆕 Created default habits")
         }
+        
+        updateStreakOnLaunch()
     }
     
     /// Save current habits to UserDefaults
@@ -94,6 +168,8 @@ struct ContentView: View {
             UserDefaults.standard.set(encoded, forKey: "savedHabits")
             print("💾 Saved \(habits.count) habits to UserDefaults")
         }
+        // NEW: Check if all habits completed
+           checkAndUpdateStreak()
     }
     
     /// Create the default list of habits
@@ -130,6 +206,12 @@ struct ContentView: View {
         }
     }
 
+func updateStreakOnLaunch() {
+    // TEMPORARY: For testing - simulate yesterday
+    // lastCompletionDate = Calendar.current.date(byAdding: .day, value: -1, to: Date())
+    
+    // ... rest of your code
+}
     // MARK: - Data Models
 
     /// Habit data structure - Codable allows saving to UserDefaults
@@ -156,7 +238,7 @@ struct ContentView: View {
             }
         }
     }
-
+    
     // MARK: - Preview
 
     #Preview {
